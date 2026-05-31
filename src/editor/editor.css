@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+.ProseMirror {
+  outline: none;
+  min-height: 100%;
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 145%;
+  letter-spacing: 0.18px;
+  color: var(--text);
+  caret-color: var(--accent);
+}
+
+.ProseMirror > *:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p {
+  margin: 0 0 1em;
+}
+
+.ProseMirror h1 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  line-height: 110%;
+  margin: 32px 0;
+}
+
+.ProseMirror h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+  font-size: 36px;
+  letter-spacing: -0.72px;
+  line-height: 118%;
+  margin: 28px 0 8px;
+}
+
+.ProseMirror h3 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+  font-size: 24px;
+  letter-spacing: -0.24px;
+  line-height: 118%;
+  margin: 24px 0 8px;
+}
+
+.ProseMirror strong {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror code {
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 135%;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+
+.ProseMirror pre {
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 145%;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 0 0 1em;
+  overflow-x: auto;
+}
+
+.ProseMirror pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+@media (max-width: 1024px) {
+  .ProseMirror {
+    font-size: 16px;
+  }
+
+  .ProseMirror h1 {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+
+  .ProseMirror h2 {
+    font-size: 28px;
+  }
+
+  .ProseMirror h3 {
+    font-size: 20px;
+  }
+}
