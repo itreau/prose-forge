@@ -1,0 +1,13 @@
+{
+  "opacity": 10,
+  "textColor": "#6b6375",
+  "headingColor": "#08060d",
+  "shadowEnabled": true,
+  "shadowBlur": 2,
+  "shadowColor": "#000000",
+  "shadowOpacity": 0.25,
+  "toolbarBorderColor": "var(--border)",
+  "toolbarIconColor": "var(--text)",
+  "toolbarButtonHoverBg": "var(--muted)",
+  "toolbarButtonActiveBg": "var(--muted)"
+}

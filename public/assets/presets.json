@@ -1,0 +1,78 @@
+[
+  {
+    "name": "paper",
+    "material": {
+      "name": "paper",
+      "diffuse": "/assets/materials/paper/diffuse.jpg",
+      "roughness": "/assets/materials/paper/roughness.jpg",
+      "normal": "/assets/materials/paper/normal.jpg",
+      "height": "/assets/materials/paper/height.jpg",
+      "textureStyle": "tile",
+      "tileX": 4,
+      "tileY": 4,
+      "roughnessScale": 0.65,
+      "normalScale": 0.3,
+      "metalness": 0.0,
+      "aoScale": 1.0
+    },
+    "pointLight": {
+      "position": [12, 10, 8],
+      "intensity": 250,
+      "color": "#fefcf3",
+      "distance": 60,
+      "decay": 2,
+      "castShadow": true
+    },
+    "ambientLight": {
+      "intensity": 0.35,
+      "color": "#e8e4df"
+    },
+    "plane": {
+      "width": 2,
+      "height": 2,
+      "segments": 32
+    },
+    "cameraPosition": [0, 4.5, 1],
+    "cameraFov": 30,
+    "backgroundColor": "#1a1a2e"
+  },
+  {
+    "name": "default",
+    "material": {
+      "name": "default",
+      "diffuse": "/assets/materials/default/diffuse.png",
+      "roughness": "/assets/materials/default/roughness.png",
+      "normal": "/assets/materials/default/normal.png",
+      "height": "/assets/materials/default/height.png",
+      "specular": "/assets/materials/default/specular.png",
+      "ao": "/assets/materials/default/ao.png",
+      "textureStyle": "tile",
+      "tileX": 4,
+      "tileY": 4,
+      "roughnessScale": 0.65,
+      "normalScale": 0.3,
+      "metalness": 0.0,
+      "aoScale": 1.0
+    },
+    "pointLight": {
+      "position": [12, 10, 8],
+      "intensity": 250,
+      "color": "#fefcf3",
+      "distance": 60,
+      "decay": 2,
+      "castShadow": true
+    },
+    "ambientLight": {
+      "intensity": 0.35,
+      "color": "#e8e4df"
+    },
+    "plane": {
+      "width": 2,
+      "height": 2,
+      "segments": 32
+    },
+    "cameraPosition": [0, 4.5, 1],
+    "cameraFov": 30,
+    "backgroundColor": "#1a1a2e"
+  }
+]
