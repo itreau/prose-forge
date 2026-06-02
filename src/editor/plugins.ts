@@ -58,6 +58,7 @@ function blockDef(command: Command, label: string, icon: string, blockType: stri
 
 const toggleStrong = toggleMark(editorSchema.marks.strong);
 const toggleEm = toggleMark(editorSchema.marks.em);
+const toggleStrikethrough = toggleMark(editorSchema.marks.strikethrough);
 const toggleCode = toggleMark(editorSchema.marks.code);
 const setHeading1 = toggleBlockType(editorSchema.nodes.heading, { level: 1 });
 const setHeading2 = toggleBlockType(editorSchema.nodes.heading, { level: 2 });
@@ -67,6 +68,7 @@ const setCodeBlock = toggleBlockType(editorSchema.nodes.code_block);
 export const toolbarCommands: ToolbarCommand[] = [
   markDef(toggleStrong, "Bold", "bold", "strong"),
   markDef(toggleEm, "Italic", "italic", "em"),
+  markDef(toggleStrikethrough, "Strikethrough", "strikethrough", "strikethrough"),
   markDef(toggleCode, "Code", "code", "code"),
   blockDef(setHeading1, "Heading 1", "heading-1", "heading-1"),
   blockDef(setHeading2, "Heading 2", "heading-2", "heading-2"),
@@ -80,6 +82,7 @@ export function createPlugins(): Plugin[] {
     keymap({
       "Mod-b": toggleStrong,
       "Mod-i": toggleEm,
+      "Mod-Shift-s": toggleStrikethrough,
       "Mod-`": toggleCode,
       "Mod-Shift-7": setHeading1,
       "Mod-Shift-8": setHeading2,

@@ -4,6 +4,7 @@ import { Toggle } from "@/components/ui/toggle";
 import {
   Bold,
   Italic,
+  Strikethrough,
   Code,
   Heading1,
   Heading2,
@@ -19,6 +20,7 @@ import type { ToolbarCommand } from "../plugins";
 const ICON_MAP: Record<string, React.ReactNode> = {
   "bold": <Bold className="size-4" />,
   "italic": <Italic className="size-4" />,
+  "strikethrough": <Strikethrough className="size-4" />,
   "code": <Code className="size-4" />,
   "heading-1": <Heading1 className="size-4" />,
   "heading-2": <Heading2 className="size-4" />,

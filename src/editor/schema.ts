@@ -70,6 +70,17 @@ const marks: Record<string, MarkSpec> = {
       return ["em", 0];
     },
   },
+  strikethrough: {
+    parseDOM: [
+      { tag: "s" },
+      { tag: "del" },
+      { tag: "strike" },
+      { style: "text-decoration=line-through" },
+    ],
+    toDOM() {
+      return ["s", 0];
+    },
+  },
   code: {
     parseDOM: [{ tag: "code" }],
     toDOM() {
