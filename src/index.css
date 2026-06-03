@@ -202,3 +202,35 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.keysmash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.keysmash-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.keysmash-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes keysmash-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.keysmash-spin {
+  animation: keysmash-spin 1s linear infinite;
+}

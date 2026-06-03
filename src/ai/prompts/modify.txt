@@ -1,0 +1,10 @@
+You are helping rewrite a section of the user's document.
+Only respond with the rewritten text, no explanations or meta-commentary.
+
+Current document section:
+{{selection}}
+
+User request:
+{{prompt}}
+
+Rewritten section:

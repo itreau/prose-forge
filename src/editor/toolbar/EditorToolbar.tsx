@@ -12,10 +12,13 @@ import {
   Code2,
   Settings2,
   Palette,
+  MessageSquare,
+  Pencil,
 } from "lucide-react";
 import { editorSchema } from "../schema";
 import { toolbarCommands } from "../plugins";
 import type { ToolbarCommand } from "../plugins";
+import KeysmashButton from "../../ai/keysmash-button";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   "bold": <Bold className="size-4" />,
@@ -73,7 +76,7 @@ function isPressed(cmd: ToolbarCommand, activeMarks: Set<string>, activeBlock: s
   return cmd.blockType === activeBlock;
 }
 
-export default function EditorToolbar({ onSceneToggle, onEditorToggle }: { onSceneToggle: () => void; onEditorToggle: () => void }) {
+export default function EditorToolbar({ onSceneToggle, onEditorToggle, onChatToggle, onModifyToggle, onKeysmash, isKeysmashing, chatOpen }: { onSceneToggle: () => void; onEditorToggle: () => void; onChatToggle: () => void; onModifyToggle: () => void; onKeysmash: () => void; isKeysmashing: boolean; chatOpen: boolean }) {
   const activeMarks = useActiveMarks();
   const activeBlock = useActiveBlockType();
 
@@ -90,6 +93,25 @@ export default function EditorToolbar({ onSceneToggle, onEditorToggle }: { onSce
         />
       ))}
       <div className="mx-1 h-4 w-px bg-border" />
+      <KeysmashButton isGenerating={isKeysmashing} onClick={onKeysmash} />
+      <Toggle
+        aria-label="AI Modify"
+        pressed={false}
+        onPressedChange={onModifyToggle}
+        size="sm"
+        variant="outline"
+      >
+        <Pencil className="size-4" />
+      </Toggle>
+      <Toggle
+        aria-label="AI Chat"
+        pressed={chatOpen}
+        onPressedChange={onChatToggle}
+        size="sm"
+        variant="outline"
+      >
+        <MessageSquare className="size-4" />
+      </Toggle>
       <Toggle
         aria-label="Scene settings"
         pressed={false}

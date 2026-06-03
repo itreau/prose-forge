@@ -1,0 +1,8 @@
+Continue the following document by writing the next paragraph.
+Match the style, tone, and voice of the existing text.
+Only output the paragraph text, no labels, quotes, or explanations.
+
+Document so far:
+{{document}}
+
+Next paragraph:
