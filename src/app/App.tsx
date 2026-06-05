@@ -5,7 +5,8 @@ import { PaperScene } from "../scene";
 import SceneOptions from "../scene-options/SceneOptions";
 import EditorOptions from "../editor-options/EditorOptions";
 import ChatSidebar from "../ai/chat-sidebar";
-import ModifyPrompt, { ModifyPreview } from "../ai/modify-prompt";
+import ModifyPrompt from "../ai/modify-prompt";
+import KeysmashPrompt from "../ai/keysmash-prompt";
 import { useSceneConfig } from "../hooks/useSceneConfig";
 import { useEditorConfig } from "../hooks/useEditorConfig";
 import { useModify } from "../ai/use-modify";
@@ -13,6 +14,7 @@ import { useKeysmash } from "../ai/use-keysmash";
 import { extractAIDocument, toMarkdown } from "../ai/document-adapter";
 import { getSelectionTarget } from "../ai/selection-target";
 import { applyModification } from "../ai/apply-modification";
+import { insertGeneratedText } from "../ai/keysmash-insert";
 import type { EditorView } from "prosemirror-view";
 
 type ActivePanel = "scene" | "editor" | null;
@@ -28,8 +30,7 @@ export default function App() {
   const { state: modifyState, open: modifyOpen, close: modifyClose, stop: modifyStop, submit: modifySubmit, clearPreview: modifyClearPreview } = useModify();
 
   const getEditorState = useCallback(() => editorStateRef.current, []);
-  const getEditorView = useCallback(() => editorViewRef.current, []);
-  const { isGenerating: isKeysmashing, generate: keysmashGenerate } = useKeysmash(getEditorState, getEditorView);
+  const { state: keysmashState, open: keysmashOpen, close: keysmashClose, stop: keysmashStop, submit: keysmashSubmit, clearPreview: keysmashClearPreview } = useKeysmash(getEditorState);
 
   const handleEditorStateChange = useCallback((state: EditorState) => {
     editorStateRef.current = state;
@@ -53,8 +54,15 @@ export default function App() {
     const view = editorViewRef.current;
     if (!view || !modifyState.target || !modifyState.buffer) return;
     applyModification(view, modifyState.target.from, modifyState.target.to, modifyState.buffer);
-    modifyClearPreview();
-  }, [modifyState.target, modifyState.buffer, modifyClearPreview]);
+    modifyClose();
+  }, [modifyState.target, modifyState.buffer, modifyClose]);
+
+  const handleKeysmashApply = useCallback(() => {
+    const view = editorViewRef.current;
+    if (!view || !keysmashState.buffer) return;
+    insertGeneratedText(view, keysmashState.buffer);
+    keysmashClose();
+  }, [keysmashState.buffer, keysmashClose]);
 
   const handleViewReady = useCallback((view: EditorView | null) => {
     editorViewRef.current = view;
@@ -71,22 +79,12 @@ export default function App() {
           onEditorToggle={() => setActivePanel((v) => v === "editor" ? null : "editor")}
           onChatToggle={() => setChatOpen((v) => !v)}
           onModifyToggle={handleModifyToggle}
-          onKeysmash={keysmashGenerate}
-          isKeysmashing={isKeysmashing}
+          onKeysmash={keysmashOpen}
+          isKeysmashing={keysmashState.isStreaming}
           chatOpen={chatOpen}
           onStateChange={handleEditorStateChange}
           onViewReady={handleViewReady}
           editorStyles={editorStyles}
-          modifyPreview={
-            modifyState.buffer ? (
-              <ModifyPreview
-                modifyState={modifyState}
-                onStop={modifyStop}
-                onClearPreview={modifyClearPreview}
-                onApply={handleModifyApply}
-              />
-            ) : null
-          }
         />
       </div>
       {chatOpen && (
@@ -99,6 +97,17 @@ export default function App() {
         modifyState={modifyState}
         onSubmit={modifySubmit}
         onClose={modifyClose}
+        onStop={modifyStop}
+        onApply={handleModifyApply}
+        onClearPreview={modifyClearPreview}
+      />
+      <KeysmashPrompt
+        keysmashState={keysmashState}
+        onSubmit={keysmashSubmit}
+        onClose={keysmashClose}
+        onStop={keysmashStop}
+        onApply={handleKeysmashApply}
+        onClearPreview={keysmashClearPreview}
       />
       {activePanel === "scene" && (
         <SceneOptions

@@ -1,4 +1,5 @@
 Continue the following document by writing the next paragraph.
+{{direction}}
 Match the style, tone, and voice of the existing text.
 Only output the paragraph text, no labels, quotes, or explanations.
 

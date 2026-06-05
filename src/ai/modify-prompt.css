@@ -11,6 +11,7 @@
 
 .modify-prompt {
   width: 400px;
+  max-width: calc(100vw - 2rem);
   background: color-mix(in srgb, var(--bg) 95%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -21,6 +22,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transition: width 0.2s ease;
+}
+
+.modify-prompt.has-preview {
+  width: 560px;
 }
 
 .modify-prompt-header {
@@ -93,6 +99,7 @@
   color: var(--muted-foreground);
   margin-bottom: 0.25rem;
   font-weight: 600;
+  padding: 0.5rem 0.75rem 0;
 }
 
 .modify-error {
@@ -126,4 +133,26 @@
 .modify-btn-primary {
   background: color-mix(in srgb, var(--accent) 20%, transparent);
   border-color: var(--accent-border);
+}
+
+.modify-preview-inline {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: var(--text-h);
+}
+
+.modify-preview-text {
+  padding: 0.25rem 0.75rem;
+  max-height: 160px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.modify-preview-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0.75rem;
 }

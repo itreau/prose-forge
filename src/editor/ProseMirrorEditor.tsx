@@ -19,7 +19,6 @@ function EditorInner({
   onKeysmash,
   isKeysmashing,
   chatOpen,
-  modifyPreview,
   onViewReady,
 }: {
   mountRef: (el: HTMLElement | null) => void;
@@ -30,7 +29,6 @@ function EditorInner({
   onKeysmash: () => void;
   isKeysmashing: boolean;
   chatOpen: boolean;
-  modifyPreview: React.ReactNode;
   onViewReady?: (view: EditorView | null) => void;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -54,7 +52,6 @@ function EditorInner({
     <div ref={editorRef} className="editor-container" onClick={handleDocumentClick}>
       <EditorToolbar onSceneToggle={onSceneToggle} onEditorToggle={onEditorToggle} onChatToggle={onChatToggle} onModifyToggle={onModifyToggle} onKeysmash={onKeysmash} isKeysmashing={isKeysmashing} chatOpen={chatOpen} />
       <div ref={mountRef} className="prosemirror-mount" />
-      {modifyPreview}
     </div>
   );
 }
@@ -70,7 +67,6 @@ export default function ProseMirrorEditor({
   editorStyles,
   onStateChange,
   onViewReady,
-  modifyPreview,
 }: {
   onSceneToggle: () => void;
   onEditorToggle: () => void;
@@ -82,7 +78,6 @@ export default function ProseMirrorEditor({
   editorStyles?: React.CSSProperties;
   onStateChange?: (state: EditorState) => void;
   onViewReady?: (view: EditorView | null) => void;
-  modifyPreview?: React.ReactNode;
 }) {
   const [mount, setMount] = useState<HTMLElement | null>(null);
   const [editorState, setEditorState] = useState(
@@ -114,7 +109,6 @@ export default function ProseMirrorEditor({
           onKeysmash={onKeysmash}
           isKeysmashing={isKeysmashing}
           chatOpen={chatOpen}
-          modifyPreview={modifyPreview ?? null}
           onViewReady={onViewReady}
         />
       </ProseMirror>

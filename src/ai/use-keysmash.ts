@@ -1,95 +1,128 @@
-import { useState, useCallback, useRef } from "react";
-import { Effect } from "effect";
+import { useReducer, useCallback, useRef } from "react";
+import { Effect, Stream, Fiber } from "effect";
+import type { RuntimeFiber } from "effect/Fiber";
 import { FetchHttpClient } from "@effect/platform";
-import { Fragment } from "prosemirror-model";
 import type { EditorState } from "prosemirror-state";
-import type { EditorView } from "prosemirror-view";
+
 import { getChatClient } from "./client";
 import type { ChatMessage } from "./types";
 import { extractAIDocument, toMarkdown } from "./document-adapter";
-import { parseMarkdownParagraphs } from "./selection-target";
 import { loadPrompt } from "./prompts/loader";
 import promptTemplate from "./prompts/keysmash.txt?raw";
 
-function insertGeneratedText(view: EditorView, text: string): void {
-  const trimmed = text.trim();
-  if (!trimmed) return;
-
-  const nodes = parseMarkdownParagraphs(trimmed);
-
-  if (nodes.length === 0) {
-    const tr = view.state.tr;
-    const { from, to, empty } = view.state.selection;
-    if (empty) {
-      tr.insertText(trimmed, from);
-    } else {
-      tr.insertText(trimmed, from, to);
-    }
-    view.dispatch(tr);
-    view.focus();
-    return;
-  }
-
-  const fragment = Fragment.from(nodes);
-  const tr = view.state.tr;
-  const { from, to, empty } = view.state.selection;
-
-  if (empty) {
-    tr.insert(from, fragment);
-  } else {
-    tr.replaceWith(from, to, fragment);
-  }
-
-  view.dispatch(tr);
-  view.focus();
+export interface KeysmashState {
+  isOpen: boolean;
+  isStreaming: boolean;
+  buffer: string;
+  error: string | null;
 }
 
-export function useKeysmash(
-  getState: () => EditorState | null,
-  getView: () => EditorView | null,
-) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const generatingRef = useRef(false);
+type KeysmashAction =
+  | { type: "open" }
+  | { type: "close" }
+  | { type: "startStream" }
+  | { type: "appendToken"; token: string }
+  | { type: "finishStream" }
+  | { type: "setError"; error: string }
+  | { type: "clearPreview" };
 
-  const generate = useCallback(() => {
-    if (generatingRef.current) return;
-    const state = getState();
-    const view = getView();
-    if (!state || !view) return;
+const initialKeysmashState: KeysmashState = {
+  isOpen: false,
+  isStreaming: false,
+  buffer: "",
+  error: null,
+};
 
-    const cursorPos = state.selection.from;
-    const aiDoc = extractAIDocument(state.doc, cursorPos);
+function keysmashReducer(state: KeysmashState, action: KeysmashAction): KeysmashState {
+  switch (action.type) {
+    case "open":
+      return { ...initialKeysmashState, isOpen: true };
+    case "close":
+      return initialKeysmashState;
+    case "startStream":
+      return { ...state, isStreaming: true, buffer: "", error: null };
+    case "appendToken":
+      return { ...state, buffer: state.buffer + action.token };
+    case "finishStream":
+      return { ...state, isStreaming: false };
+    case "setError":
+      return { ...state, isStreaming: false, error: action.error };
+    case "clearPreview":
+      return { ...state, buffer: "", error: null, isStreaming: false };
+  }
+}
+
+type StreamFiber = RuntimeFiber<void, unknown>;
+
+export function useKeysmash(getState: () => EditorState | null) {
+  const [state, dispatch] = useReducer(keysmashReducer, initialKeysmashState);
+  const fiberRef = useRef<StreamFiber | null>(null);
+
+  const cancelFiber = useCallback(() => {
+    if (fiberRef.current) {
+      Effect.runPromise(Fiber.interrupt(fiberRef.current)).catch(() => {});
+      fiberRef.current = null;
+    }
+  }, []);
+
+  const open = useCallback(() => {
+    dispatch({ type: "open" });
+  }, []);
+
+  const close = useCallback(() => {
+    cancelFiber();
+    dispatch({ type: "close" });
+  }, [cancelFiber]);
+
+  const stop = useCallback(() => {
+    cancelFiber();
+    dispatch({ type: "close" });
+  }, [cancelFiber]);
+
+  const submit = useCallback((direction: string) => {
+    const editorState = getState();
+    if (!editorState || state.isStreaming) return;
+
+    const cursorPos = editorState.selection.from;
+    const aiDoc = extractAIDocument(editorState.doc, cursorPos);
     const documentContext = toMarkdown(aiDoc);
 
-    const systemContent = loadPrompt(promptTemplate, { document: documentContext });
+    const directionLine = direction.trim() ? `\n${direction.trim()}\n` : "";
+    const systemContent = loadPrompt(promptTemplate, {
+      document: documentContext,
+      direction: directionLine,
+    });
+
+    const userContent = direction.trim()
+      ? direction.trim()
+      : "Continue writing the next paragraph.";
+
     const apiMessages: ChatMessage[] = [
       { role: "system", content: systemContent },
-      { role: "user", content: "Continue writing the next paragraph." },
+      { role: "user", content: userContent },
     ];
 
-    generatingRef.current = true;
-    setIsGenerating(true);
+    dispatch({ type: "startStream" });
 
     const client = getChatClient();
+    const stream = client.stream(apiMessages);
 
-    const program = client.complete(apiMessages).pipe(
-      Effect.tap((responseText) =>
-        Effect.sync(() => {
-          const currentView = getView();
-          if (currentView && responseText.trim()) {
-            insertGeneratedText(currentView, responseText);
-          }
-        }),
+    const program = Stream.runForEach(stream, (token: string) =>
+      Effect.sync(() => dispatch({ type: "appendToken", token })),
+    ).pipe(
+      Effect.tap(() => Effect.sync(() => dispatch({ type: "finishStream" }))),
+      Effect.catchAll((e) =>
+        Effect.sync(() => dispatch({ type: "setError", error: e.message })),
       ),
-      Effect.catchAll(() => Effect.sync(() => {})),
       Effect.provide(FetchHttpClient.layer),
     );
 
-    Effect.runPromise(program).finally(() => {
-      generatingRef.current = false;
-      setIsGenerating(false);
-    });
-  }, [getState, getView]);
+    fiberRef.current = Effect.runFork(program);
+  }, [getState, state.isStreaming]);
 
-  return { isGenerating, generate };
+  const clearPreview = useCallback(() => {
+    dispatch({ type: "clearPreview" });
+  }, []);
+
+  return { state, open, close, stop, submit, clearPreview };
 }

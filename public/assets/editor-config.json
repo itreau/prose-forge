@@ -1,13 +1,13 @@
 {
-  "opacity": 10,
-  "textColor": "#6b6375",
-  "headingColor": "#08060d",
+  "opacity": 32,
+  "textColor": "#90eab7",
+  "headingColor": "#90eab7",
   "shadowEnabled": true,
   "shadowBlur": 2,
   "shadowColor": "#000000",
-  "shadowOpacity": 0.25,
-  "toolbarBorderColor": "var(--border)",
+  "shadowOpacity": 0.1,
+  "toolbarBorderColor": "#325737",
   "toolbarIconColor": "var(--text)",
   "toolbarButtonHoverBg": "var(--muted)",
-  "toolbarButtonActiveBg": "var(--muted)"
+  "toolbarButtonActiveBg": "#1d6d59"
 }

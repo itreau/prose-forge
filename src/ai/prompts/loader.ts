@@ -4,7 +4,7 @@ export function loadPrompt(
   template: string,
   vars: Record<string, string>,
 ): string {
-  const result = template.replace(PLACEHOLDER_RE, (match, key: string) => {
+  let result = template.replace(PLACEHOLDER_RE, (match, key: string) => {
     if (key in vars) return vars[key];
     return match;
   });
@@ -16,6 +16,8 @@ export function loadPrompt(
       `Unfilled prompt template variable(s): ${unique.join(", ")}`,
     );
   }
+
+  result = result.replace(/\n{3,}/g, "\n\n");
 
   return result;
 }

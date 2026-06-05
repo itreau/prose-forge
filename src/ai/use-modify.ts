@@ -52,7 +52,7 @@ function modifyReducer(state: ModifyState, action: ModifyAction): ModifyState {
     case "setError":
       return { ...state, isStreaming: false, error: action.error };
     case "clearPreview":
-      return initialModifyState;
+      return { ...state, buffer: "", error: null, isStreaming: false };
   }
 }
 
