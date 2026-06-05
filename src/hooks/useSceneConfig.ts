@@ -3,7 +3,13 @@ import { loadFromStorage, saveToStorage, clearStorage, downloadJson } from "./us
 import { defaultSceneConfig } from "../scene/config";
 import type { SceneConfig } from "../scene/config";
 
-const STORAGE_KEY = "prose-forge-scene-config";
+const STORAGE_KEY = "prose-forge-scene-config-v2";
+
+function isValidSceneConfig(cfg: unknown): cfg is SceneConfig {
+  if (!cfg || typeof cfg !== "object") return false;
+  const pl = (cfg as SceneConfig).pointLight;
+  return pl !== undefined && typeof pl.lightDistance === "number";
+}
 
 export interface Preset {
   name: string;
@@ -38,9 +44,11 @@ export function useSceneConfig() {
     async function init() {
       let presetName = "";
       const localConfig = loadFromStorage<SceneConfig>(STORAGE_KEY);
-      if (localConfig) {
+      if (localConfig && isValidSceneConfig(localConfig)) {
         presetName = localConfig.material?.name ?? "";
         setConfig(localConfig);
+      } else if (localConfig) {
+        clearStorage(STORAGE_KEY);
       }
 
       try {

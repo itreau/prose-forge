@@ -20,12 +20,25 @@ export interface MaterialConfig {
 }
 
 export interface PointLightConfig {
-  position: [number, number, number];
+  lightDistance: number;
+  lightHorizontal: number;
+  lightVertical: number;
   intensity: number;
   color: string;
   distance: number;
   decay: number;
   castShadow: boolean;
+}
+
+export function computeLightPosition(
+  light: PointLightConfig,
+  plane: PlaneConfig,
+): [number, number, number] {
+  return [
+    (light.lightHorizontal - 0.5) * plane.width,
+    light.lightDistance * 3,
+    (0.5 - light.lightVertical) * plane.height,
+  ];
 }
 
 export interface AmbientLightConfig {
@@ -65,7 +78,9 @@ export const defaultSceneConfig: SceneConfig = {
     aoScale: 1.0,
   },
   pointLight: {
-    position: [12, 10, 8],
+    lightDistance: 0.67,
+    lightHorizontal: 0.5,
+    lightVertical: 0.5,
     intensity: 250,
     color: "#fefcf3",
     distance: 60,

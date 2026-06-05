@@ -2,39 +2,45 @@
   {
     "name": "paper",
     "material": {
-      "name": "paper",
-      "diffuse": "/assets/materials/paper/diffuse.jpg",
-      "roughness": "/assets/materials/paper/roughness.jpg",
-      "normal": "/assets/materials/paper/normal.jpg",
-      "height": "/assets/materials/paper/height.jpg",
-      "textureStyle": "tile",
-      "tileX": 4,
-      "tileY": 4,
-      "roughnessScale": 0.65,
-      "normalScale": 0.3,
-      "metalness": 0.0,
-      "aoScale": 1.0
-    },
-    "pointLight": {
-      "position": [12, 10, 8],
-      "intensity": 250,
-      "color": "#fefcf3",
-      "distance": 60,
-      "decay": 2,
-      "castShadow": true
-    },
-    "ambientLight": {
-      "intensity": 0.35,
-      "color": "#e8e4df"
-    },
-    "plane": {
-      "width": 2,
-      "height": 2,
-      "segments": 32
-    },
-    "cameraPosition": [0, 4.5, 1],
-    "cameraFov": 30,
-    "backgroundColor": "#1a1a2e"
+        "name": "paper",
+        "diffuse": "/assets/materials/paper/diffuse.jpg",
+        "roughness": "/assets/materials/paper/roughness.jpg",
+        "normal": "/assets/materials/paper/normal.jpg",
+        "height": "/assets/materials/paper/height.jpg",
+        "textureStyle": "tile",
+        "tileX": 4,
+        "tileY": 4,
+        "roughnessScale": 1,
+        "normalScale": 0.1,
+        "metalness": 0,
+        "aoScale": 1
+      },
+      "pointLight": {
+        "lightDistance": 0.25,
+        "lightHorizontal": 0.5,
+        "lightVertical": 0.9,
+        "intensity": 1,
+        "color": "#fefcf3",
+        "distance": 5,
+        "decay": 0.8,
+        "castShadow": true
+      },
+      "ambientLight": {
+        "intensity": 2,
+        "color": "#0a4f5c"
+      },
+      "plane": {
+        "width": 6,
+        "height": 6,
+        "segments": 32
+      },
+      "cameraPosition": [
+        0,
+        4.5,
+        1
+      ],
+      "cameraFov": 30,
+      "backgroundColor": "#1a1a2e"
   },
   {
     "name": "default",
@@ -55,7 +61,9 @@
       "aoScale": 1.0
     },
     "pointLight": {
-      "position": [12, 10, 8],
+      "lightDistance": 0.67,
+      "lightHorizontal": 0.5,
+      "lightVertical": 0.5,
       "intensity": 250,
       "color": "#fefcf3",
       "distance": 60,

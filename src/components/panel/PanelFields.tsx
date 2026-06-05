@@ -42,6 +42,13 @@ export function SliderField({
   step: number;
   onChange: (v: number) => void;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(value));
+
+  if (!editing && draft !== String(value)) {
+    setDraft(String(value));
+  }
+
   return (
     <div className="panel-field">
       <span className="panel-field-label">{label}</span>
@@ -61,8 +68,25 @@ export function SliderField({
           min={min}
           max={max}
           step={step}
-          value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          value={editing ? draft : value}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            const v = parseFloat(e.target.value);
+            if (!isNaN(v)) onChange(v);
+          }}
+          onFocus={() => {
+            setEditing(true);
+            setDraft(String(value));
+          }}
+          onBlur={() => {
+            setEditing(false);
+            const v = parseFloat(draft);
+            if (!isNaN(v)) {
+              onChange(Math.min(max, Math.max(min, v)));
+            } else {
+              setDraft(String(value));
+            }
+          }}
         />
       </div>
     </div>

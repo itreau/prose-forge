@@ -9,6 +9,7 @@ import ModifyPrompt from "../ai/modify-prompt";
 import KeysmashPrompt from "../ai/keysmash-prompt";
 import { useSceneConfig } from "../hooks/useSceneConfig";
 import { useEditorConfig } from "../hooks/useEditorConfig";
+import { computeLightPosition } from "../scene/config";
 import { useModify } from "../ai/use-modify";
 import { useKeysmash } from "../ai/use-keysmash";
 import { extractAIDocument, toMarkdown } from "../ai/document-adapter";
@@ -21,7 +22,8 @@ type ActivePanel = "scene" | "editor" | null;
 
 export default function App() {
   const { config, presets, activePreset, loaded, onChange, onSave, onReset, onPresetChange, onDownload: onSceneDownload } = useSceneConfig();
-  const { config: editorConfig, editorStyles, onChange: onEditorChange, onSave: onEditorSave, onReset: onEditorReset, onDownload: onEditorDownload } = useEditorConfig(config.pointLight.position);
+  const lightPosition = computeLightPosition(config.pointLight, config.plane);
+  const { config: editorConfig, editorStyles, onChange: onEditorChange, onSave: onEditorSave, onReset: onEditorReset, onDownload: onEditorDownload } = useEditorConfig(lightPosition);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const editorStateRef = useRef<EditorState | null>(null);
@@ -72,7 +74,7 @@ export default function App() {
 
   return (
     <>
-      <PaperScene config={config} className="scene-canvas" />
+      <PaperScene config={config} className="scene-canvas" showLightHelper={activePanel === "scene"} />
       <div className="editor-overlay" style={chatOpen ? { marginRight: "340px" } : undefined}>
         <ProseMirrorEditor
           onSceneToggle={() => setActivePanel((v) => v === "scene" ? null : "scene")}

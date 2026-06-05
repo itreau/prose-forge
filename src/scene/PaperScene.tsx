@@ -8,6 +8,7 @@ import SceneLighting from "./SceneLighting";
 interface PaperSceneProps {
   config: SceneConfig;
   className?: string;
+  showLightHelper?: boolean;
 }
 
 function SceneFallback() {
@@ -19,7 +20,7 @@ function SceneFallback() {
   );
 }
 
-export default function PaperScene({ config, className }: PaperSceneProps) {
+export default function PaperScene({ config, className, showLightHelper = false }: PaperSceneProps) {
   return (
     <Canvas
       className={className}
@@ -43,6 +44,8 @@ export default function PaperScene({ config, className }: PaperSceneProps) {
       <SceneLighting
         pointLight={config.pointLight}
         ambientLight={config.ambientLight}
+        plane={config.plane}
+        showLightHelper={showLightHelper}
       />
       <Suspense fallback={<SceneFallback />}>
         <PaperPlane material={config.material} plane={config.plane} />
