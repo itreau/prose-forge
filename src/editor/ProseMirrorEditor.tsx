@@ -14,6 +14,7 @@ function EditorInner({
   mountRef,
   onSceneToggle,
   onEditorToggle,
+  onExportToggle,
   onChatToggle,
   onModifyToggle,
   onKeysmash,
@@ -24,6 +25,7 @@ function EditorInner({
   mountRef: (el: HTMLElement | null) => void;
   onSceneToggle: () => void;
   onEditorToggle: () => void;
+  onExportToggle: () => void;
   onChatToggle: () => void;
   onModifyToggle: () => void;
   onKeysmash: () => void;
@@ -50,7 +52,7 @@ function EditorInner({
 
   return (
     <div ref={editorRef} className="editor-container" onClick={handleDocumentClick}>
-      <EditorToolbar onSceneToggle={onSceneToggle} onEditorToggle={onEditorToggle} onChatToggle={onChatToggle} onModifyToggle={onModifyToggle} onKeysmash={onKeysmash} isKeysmashing={isKeysmashing} chatOpen={chatOpen} />
+      <EditorToolbar onSceneToggle={onSceneToggle} onEditorToggle={onEditorToggle} onExportToggle={onExportToggle} onChatToggle={onChatToggle} onModifyToggle={onModifyToggle} onKeysmash={onKeysmash} isKeysmashing={isKeysmashing} chatOpen={chatOpen} />
       <div ref={mountRef} className="prosemirror-mount" />
     </div>
   );
@@ -59,6 +61,7 @@ function EditorInner({
 export default function ProseMirrorEditor({
   onSceneToggle,
   onEditorToggle,
+  onExportToggle,
   onChatToggle,
   onModifyToggle,
   onKeysmash,
@@ -70,6 +73,7 @@ export default function ProseMirrorEditor({
 }: {
   onSceneToggle: () => void;
   onEditorToggle: () => void;
+  onExportToggle: () => void;
   onChatToggle: () => void;
   onModifyToggle: () => void;
   onKeysmash: () => void;
@@ -104,6 +108,7 @@ export default function ProseMirrorEditor({
           mountRef={setMount}
           onSceneToggle={onSceneToggle}
           onEditorToggle={onEditorToggle}
+          onExportToggle={onExportToggle}
           onChatToggle={onChatToggle}
           onModifyToggle={onModifyToggle}
           onKeysmash={onKeysmash}

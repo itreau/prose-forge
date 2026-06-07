@@ -14,6 +14,7 @@ import {
   Palette,
   MessageSquare,
   Pencil,
+  Download,
 } from "lucide-react";
 import { editorSchema } from "../schema";
 import { toolbarCommands } from "../plugins";
@@ -76,7 +77,7 @@ function isPressed(cmd: ToolbarCommand, activeMarks: Set<string>, activeBlock: s
   return cmd.blockType === activeBlock;
 }
 
-export default function EditorToolbar({ onSceneToggle, onEditorToggle, onChatToggle, onModifyToggle, onKeysmash, isKeysmashing, chatOpen }: { onSceneToggle: () => void; onEditorToggle: () => void; onChatToggle: () => void; onModifyToggle: () => void; onKeysmash: () => void; isKeysmashing: boolean; chatOpen: boolean }) {
+export default function EditorToolbar({ onSceneToggle, onEditorToggle, onExportToggle, onChatToggle, onModifyToggle, onKeysmash, isKeysmashing, chatOpen }: { onSceneToggle: () => void; onEditorToggle: () => void; onExportToggle: () => void; onChatToggle: () => void; onModifyToggle: () => void; onKeysmash: () => void; isKeysmashing: boolean; chatOpen: boolean }) {
   const activeMarks = useActiveMarks();
   const activeBlock = useActiveBlockType();
 
@@ -129,6 +130,15 @@ export default function EditorToolbar({ onSceneToggle, onEditorToggle, onChatTog
         variant="outline"
       >
         <Palette className="size-4" />
+      </Toggle>
+      <Toggle
+        aria-label="Export"
+        pressed={false}
+        onPressedChange={onExportToggle}
+        size="sm"
+        variant="outline"
+      >
+        <Download className="size-4" />
       </Toggle>
     </div>
   );

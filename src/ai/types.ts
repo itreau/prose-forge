@@ -1,15 +1,3 @@
-export interface AIDocument {
-  chunks: AIDocumentChunk[];
-  cursorPosition?: number;
-}
-
-export interface AIDocumentChunk {
-  id: string;
-  type: "paragraph" | "heading" | "code_block";
-  level?: number;
-  content: string;
-}
-
 export interface AIConfig {
   apiUrl: string;
   apiKey: string;

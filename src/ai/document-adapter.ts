@@ -1,74 +1,8 @@
-import type { Node as ProseMirrorNode } from "prosemirror-model";
 import { Fragment, Slice } from "prosemirror-model";
+import type { Node as ProseMirrorNode } from "prosemirror-model";
 import type { EditorState, Transaction } from "prosemirror-state";
 import { editorSchema } from "../editor/schema";
-import type { AIDocument, AIDocumentChunk } from "./types";
-
-const BLOCK_TYPES = new Set(["paragraph", "heading", "code_block"]);
-
-function extractInlineText(node: ProseMirrorNode): string {
-  const parts: string[] = [];
-  node.forEach((child) => {
-    if (child.isText) {
-      parts.push(child.text ?? "");
-    } else if (child.type.name === "hard_break") {
-      parts.push("\n");
-    }
-  });
-  return parts.join("");
-}
-
-export function extractAIDocument(
-  doc: ProseMirrorNode,
-  cursorPos?: number,
-): AIDocument {
-  const chunks: AIDocumentChunk[] = [];
-  let cursorChunkIndex: number | undefined;
-
-  doc.forEach((child, offset) => {
-    if (!BLOCK_TYPES.has(child.type.name)) return;
-
-    const chunk: AIDocumentChunk = {
-      id: `chunk-${chunks.length}`,
-      type: child.type.name as AIDocumentChunk["type"],
-      content: extractInlineText(child),
-    };
-
-    if (child.type.name === "heading") {
-      chunk.level = child.attrs.level as number;
-    }
-
-    if (
-      cursorPos !== undefined &&
-      cursorChunkIndex === undefined &&
-      cursorPos >= offset &&
-      cursorPos <= offset + child.nodeSize
-    ) {
-      cursorChunkIndex = chunks.length;
-    }
-
-    chunks.push(chunk);
-  });
-
-  return { chunks, cursorPosition: cursorChunkIndex };
-}
-
-export function toMarkdown(aiDoc: AIDocument): string {
-  return aiDoc.chunks
-    .map((chunk) => {
-      switch (chunk.type) {
-        case "heading": {
-          const prefix = "#".repeat(chunk.level ?? 1);
-          return `${prefix} ${chunk.content}`;
-        }
-        case "code_block":
-          return `\`\`\`\n${chunk.content}\n\`\`\``;
-        case "paragraph":
-          return chunk.content;
-      }
-    })
-    .join("\n\n");
-}
+import type { Document, DocumentChunk } from "../document";
 
 function buildInlineNodes(
   text: string,
@@ -101,7 +35,7 @@ function buildInlineNodes(
   return nodes;
 }
 
-function chunkToNode(chunk: AIDocumentChunk): ProseMirrorNode {
+function chunkToNode(chunk: DocumentChunk): ProseMirrorNode {
   switch (chunk.type) {
     case "paragraph": {
       const inlineNodes = buildInlineNodes(chunk.content, "paragraph");
@@ -129,7 +63,7 @@ function chunkToNode(chunk: AIDocumentChunk): ProseMirrorNode {
 
 export function createTransaction(
   state: EditorState,
-  aiDoc: AIDocument,
+  aiDoc: Document,
 ): Transaction {
   const tr = state.tr;
   const newNodes = aiDoc.chunks.map(chunkToNode);

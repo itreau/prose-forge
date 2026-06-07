@@ -4,6 +4,7 @@ import ProseMirrorEditor from "../editor/ProseMirrorEditor";
 import { PaperScene } from "../scene";
 import SceneOptions from "../scene-options/SceneOptions";
 import EditorOptions from "../editor-options/EditorOptions";
+import ExportOptions from "../export/ExportOptions";
 import ChatSidebar from "../ai/chat-sidebar";
 import ModifyPrompt from "../ai/modify-prompt";
 import KeysmashPrompt from "../ai/keysmash-prompt";
@@ -12,13 +13,13 @@ import { useEditorConfig } from "../hooks/useEditorConfig";
 import { computeLightPosition } from "../scene/config";
 import { useModify } from "../ai/use-modify";
 import { useKeysmash } from "../ai/use-keysmash";
-import { extractAIDocument, toMarkdown } from "../ai/document-adapter";
+import { extractDocument, toMarkdown } from "../document";
 import { getSelectionTarget } from "../ai/selection-target";
 import { applyModification } from "../ai/apply-modification";
 import { insertGeneratedText } from "../ai/keysmash-insert";
 import type { EditorView } from "prosemirror-view";
 
-type ActivePanel = "scene" | "editor" | null;
+type ActivePanel = "scene" | "editor" | "export" | null;
 
 export default function App() {
   const { config, presets, activePreset, loaded, onChange, onSave, onReset, onPresetChange, onDownload: onSceneDownload } = useSceneConfig();
@@ -41,9 +42,11 @@ export default function App() {
   const getDocumentContext = useCallback(() => {
     const state = editorStateRef.current;
     if (!state) return "";
-    const aiDoc = extractAIDocument(state.doc);
+    const aiDoc = extractDocument(state.doc);
     return toMarkdown(aiDoc);
   }, []);
+
+  const getEditorDoc = useCallback(() => editorStateRef.current?.doc ?? null, []);
 
   const handleModifyToggle = useCallback(() => {
     const state = editorStateRef.current;
@@ -79,6 +82,7 @@ export default function App() {
         <ProseMirrorEditor
           onSceneToggle={() => setActivePanel((v) => v === "scene" ? null : "scene")}
           onEditorToggle={() => setActivePanel((v) => v === "editor" ? null : "editor")}
+          onExportToggle={() => setActivePanel((v) => v === "export" ? null : "export")}
           onChatToggle={() => setChatOpen((v) => !v)}
           onModifyToggle={handleModifyToggle}
           onKeysmash={keysmashOpen}
@@ -131,6 +135,12 @@ export default function App() {
           onSave={onEditorSave}
           onReset={onEditorReset}
           onDownload={onEditorDownload}
+          onClose={() => setActivePanel(null)}
+        />
+      )}
+      {activePanel === "export" && (
+        <ExportOptions
+          getDocument={getEditorDoc}
           onClose={() => setActivePanel(null)}
         />
       )}

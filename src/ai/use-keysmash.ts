@@ -6,7 +6,7 @@ import type { EditorState } from "prosemirror-state";
 
 import { getChatClient } from "./client";
 import type { ChatMessage } from "./types";
-import { extractAIDocument, toMarkdown } from "./document-adapter";
+import { extractDocument, toMarkdown } from "../document";
 import { loadPrompt } from "./prompts/loader";
 import promptTemplate from "./prompts/keysmash.txt?raw";
 
@@ -84,7 +84,7 @@ export function useKeysmash(getState: () => EditorState | null) {
     if (!editorState || state.isStreaming) return;
 
     const cursorPos = editorState.selection.from;
-    const aiDoc = extractAIDocument(editorState.doc, cursorPos);
+    const aiDoc = extractDocument(editorState.doc, cursorPos);
     const documentContext = toMarkdown(aiDoc);
 
     const directionLine = direction.trim() ? `\n${direction.trim()}\n` : "";

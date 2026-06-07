@@ -214,9 +214,9 @@ export function PanelActions({
 }: {
   title: string;
   onClose: () => void;
-  onSave: () => void;
-  onReset: () => void;
-  onDownload: () => void;
+  onSave?: () => void;
+  onReset?: () => void;
+  onDownload?: () => void;
 }) {
   return (
     <div className="panel-actions">
@@ -226,19 +226,27 @@ export function PanelActions({
           <X size={14} />
         </button>
       </div>
-      <div className="panel-buttons">
-        <button className="panel-btn" onClick={onSave} type="button" title="Save to local storage">
-          <Save size={14} />
-          Save
-        </button>
-        <button className="panel-btn" onClick={onReset} type="button" title="Reset to defaults">
-          <RotateCcw size={14} />
-          Reset
-        </button>
-        <button className="panel-btn" onClick={onDownload} type="button" title="Download JSON">
-          <Download size={14} />
-        </button>
-      </div>
+      {(onSave || onReset || onDownload) && (
+        <div className="panel-buttons">
+          {onSave && (
+            <button className="panel-btn" onClick={onSave} type="button" title="Save to local storage">
+              <Save size={14} />
+              Save
+            </button>
+          )}
+          {onReset && (
+            <button className="panel-btn" onClick={onReset} type="button" title="Reset to defaults">
+              <RotateCcw size={14} />
+              Reset
+            </button>
+          )}
+          {onDownload && (
+            <button className="panel-btn" onClick={onDownload} type="button" title="Download JSON">
+              <Download size={14} />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
