@@ -4,12 +4,14 @@ import ProseMirrorEditor from "../editor/ProseMirrorEditor";
 import { PaperScene } from "../scene";
 import SceneOptions from "../scene-options/SceneOptions";
 import EditorOptions from "../editor-options/EditorOptions";
+import DocumentOptions from "../document-options/DocumentOptions";
 import ExportOptions from "../export/ExportOptions";
 import ChatSidebar from "../ai/chat-sidebar";
 import ModifyPrompt from "../ai/modify-prompt";
 import KeysmashPrompt from "../ai/keysmash-prompt";
 import { useSceneConfig } from "../hooks/useSceneConfig";
 import { useEditorConfig } from "../hooks/useEditorConfig";
+import { useDocumentConfig } from "../hooks/useDocumentConfig";
 import { computeLightPosition } from "../scene/config";
 import { useModify } from "../ai/use-modify";
 import { useKeysmash } from "../ai/use-keysmash";
@@ -19,12 +21,13 @@ import { applyModification } from "../ai/apply-modification";
 import { insertGeneratedText } from "../ai/keysmash-insert";
 import type { EditorView } from "prosemirror-view";
 
-type ActivePanel = "scene" | "editor" | "export" | null;
+type ActivePanel = "scene" | "editor" | "document" | "export" | null;
 
 export default function App() {
   const { config, presets, activePreset, loaded, onChange, onSave, onReset, onPresetChange, onDownload: onSceneDownload } = useSceneConfig();
   const lightPosition = computeLightPosition(config.pointLight, config.plane);
   const { config: editorConfig, editorStyles, onChange: onEditorChange, onSave: onEditorSave, onReset: onEditorReset, onDownload: onEditorDownload } = useEditorConfig(lightPosition);
+  const { config: documentConfig, onChange: onDocumentChange, onSave: onDocumentSave, onReset: onDocumentReset, onDownload: onDocumentDownload } = useDocumentConfig();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const editorStateRef = useRef<EditorState | null>(null);
@@ -75,6 +78,11 @@ export default function App() {
 
   if (!loaded) return null;
 
+  const combinedEditorStyles = {
+    ...editorStyles,
+    "--editor-max-height": `${documentConfig.maxHeight}vh`,
+  } as React.CSSProperties;
+
   return (
     <>
       <PaperScene config={config} className="scene-canvas" showLightHelper={activePanel === "scene"} />
@@ -83,6 +91,7 @@ export default function App() {
           onSceneToggle={() => setActivePanel((v) => v === "scene" ? null : "scene")}
           onEditorToggle={() => setActivePanel((v) => v === "editor" ? null : "editor")}
           onExportToggle={() => setActivePanel((v) => v === "export" ? null : "export")}
+          onDocumentToggle={() => setActivePanel((v) => v === "document" ? null : "document")}
           onChatToggle={() => setChatOpen((v) => !v)}
           onModifyToggle={handleModifyToggle}
           onKeysmash={keysmashOpen}
@@ -90,7 +99,7 @@ export default function App() {
           chatOpen={chatOpen}
           onStateChange={handleEditorStateChange}
           onViewReady={handleViewReady}
-          editorStyles={editorStyles}
+          editorStyles={combinedEditorStyles}
         />
       </div>
       {chatOpen && (
@@ -135,6 +144,16 @@ export default function App() {
           onSave={onEditorSave}
           onReset={onEditorReset}
           onDownload={onEditorDownload}
+          onClose={() => setActivePanel(null)}
+        />
+      )}
+      {activePanel === "document" && (
+        <DocumentOptions
+          config={documentConfig}
+          onChange={onDocumentChange}
+          onSave={onDocumentSave}
+          onReset={onDocumentReset}
+          onDownload={onDocumentDownload}
           onClose={() => setActivePanel(null)}
         />
       )}

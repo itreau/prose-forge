@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Pencil,
   Download,
+  FileText,
 } from "lucide-react";
 import { editorSchema } from "../schema";
 import { toolbarCommands } from "../plugins";
@@ -77,69 +78,81 @@ function isPressed(cmd: ToolbarCommand, activeMarks: Set<string>, activeBlock: s
   return cmd.blockType === activeBlock;
 }
 
-export default function EditorToolbar({ onSceneToggle, onEditorToggle, onExportToggle, onChatToggle, onModifyToggle, onKeysmash, isKeysmashing, chatOpen }: { onSceneToggle: () => void; onEditorToggle: () => void; onExportToggle: () => void; onChatToggle: () => void; onModifyToggle: () => void; onKeysmash: () => void; isKeysmashing: boolean; chatOpen: boolean }) {
+export default function EditorToolbar({ visible, onSceneToggle, onEditorToggle, onExportToggle, onDocumentToggle, onChatToggle, onModifyToggle, onKeysmash, isKeysmashing, chatOpen }: { visible: boolean; onSceneToggle: () => void; onEditorToggle: () => void; onExportToggle: () => void; onDocumentToggle: () => void; onChatToggle: () => void; onModifyToggle: () => void; onKeysmash: () => void; isKeysmashing: boolean; chatOpen: boolean }) {
   const activeMarks = useActiveMarks();
   const activeBlock = useActiveBlockType();
 
   return (
-    <div className="editor-toolbar flex items-center gap-0.5 border-b border-border pb-2 mb-2 flex-wrap">
-      {toolbarCommands.map((cmd) => (
-        <ToolbarToggle
-          key={cmd.label}
-          command={cmd.command}
-          label={cmd.label}
-          icon={ICON_MAP[cmd.icon]}
-          pressed={isPressed(cmd, activeMarks, activeBlock)}
-          separatorBefore={SEPARATOR_BEFORE.has(cmd.icon)}
-        />
-      ))}
-      <div className="mx-1 h-4 w-px bg-border" />
-      <KeysmashButton isGenerating={isKeysmashing} onClick={onKeysmash} />
-      <Toggle
-        aria-label="AI Modify"
-        pressed={false}
-        onPressedChange={onModifyToggle}
-        size="sm"
-        variant="outline"
-      >
-        <Pencil className="size-4" />
-      </Toggle>
-      <Toggle
-        aria-label="AI Chat"
-        pressed={chatOpen}
-        onPressedChange={onChatToggle}
-        size="sm"
-        variant="outline"
-      >
-        <MessageSquare className="size-4" />
-      </Toggle>
-      <Toggle
-        aria-label="Scene settings"
-        pressed={false}
-        onPressedChange={onSceneToggle}
-        size="sm"
-        variant="outline"
-      >
-        <Settings2 className="size-4" />
-      </Toggle>
-      <Toggle
-        aria-label="Editor appearance"
-        pressed={false}
-        onPressedChange={onEditorToggle}
-        size="sm"
-        variant="outline"
-      >
-        <Palette className="size-4" />
-      </Toggle>
-      <Toggle
-        aria-label="Export"
-        pressed={false}
-        onPressedChange={onExportToggle}
-        size="sm"
-        variant="outline"
-      >
-        <Download className="size-4" />
-      </Toggle>
+    <div className={`editor-toolbar-wrapper ${visible ? "editor-toolbar-visible" : "editor-toolbar-hidden"}`}>
+      <div className="editor-toolbar-blur" />
+      <div className="editor-toolbar flex items-center gap-0.5 pb-2 mb-2 flex-wrap">
+        {toolbarCommands.map((cmd) => (
+          <ToolbarToggle
+            key={cmd.label}
+            command={cmd.command}
+            label={cmd.label}
+            icon={ICON_MAP[cmd.icon]}
+            pressed={isPressed(cmd, activeMarks, activeBlock)}
+            separatorBefore={SEPARATOR_BEFORE.has(cmd.icon)}
+          />
+        ))}
+        <div className="mx-1 h-4 w-px bg-border" />
+        <KeysmashButton isGenerating={isKeysmashing} onClick={onKeysmash} />
+        <Toggle
+          aria-label="AI Modify"
+          pressed={false}
+          onPressedChange={onModifyToggle}
+          size="sm"
+          variant="outline"
+        >
+          <Pencil className="size-4" />
+        </Toggle>
+        <Toggle
+          aria-label="AI Chat"
+          pressed={chatOpen}
+          onPressedChange={onChatToggle}
+          size="sm"
+          variant="outline"
+        >
+          <MessageSquare className="size-4" />
+        </Toggle>
+        <Toggle
+          aria-label="Scene settings"
+          pressed={false}
+          onPressedChange={onSceneToggle}
+          size="sm"
+          variant="outline"
+        >
+          <Settings2 className="size-4" />
+        </Toggle>
+        <Toggle
+          aria-label="Editor appearance"
+          pressed={false}
+          onPressedChange={onEditorToggle}
+          size="sm"
+          variant="outline"
+        >
+          <Palette className="size-4" />
+        </Toggle>
+        <Toggle
+          aria-label="Document settings"
+          pressed={false}
+          onPressedChange={onDocumentToggle}
+          size="sm"
+          variant="outline"
+        >
+          <FileText className="size-4" />
+        </Toggle>
+        <Toggle
+          aria-label="Export"
+          pressed={false}
+          onPressedChange={onExportToggle}
+          size="sm"
+          variant="outline"
+        >
+          <Download className="size-4" />
+        </Toggle>
+      </div>
     </div>
   );
 }
