@@ -10,33 +10,7 @@
   padding: 1.5rem;
 }
 
-.editor-menu-icon {
-  position: absolute;
-  top: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border: none;
-  background: transparent;
-  color: var(--editor-toolbar-icon-color, var(--text));
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
 
-.editor-menu-icon-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.editor-menu-icon-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
 
 .editor-word-count {
   text-align: right;
@@ -55,8 +29,7 @@
 }
 
 .editor-toolbar-hidden {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.25;
 }
 
 .editor-toolbar-visible {

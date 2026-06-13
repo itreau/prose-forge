@@ -22,8 +22,6 @@ export interface ChatClient {
   ): Stream.Stream<string, AIError, HttpClient.HttpClient>;
 }
 
-
-
 function buildHeaders(config: AIConfig): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",

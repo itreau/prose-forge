@@ -18,13 +18,13 @@ function sanitizeFilename(title: string): string {
 export default function ExportOptions({ getDocument, onClose }: ExportOptionsProps) {
   const [title, setTitle] = useState("");
 
-  const handleExport = (exporter: Exporter) => {
+  const handleExport = async (exporter: Exporter) => {
     const doc = getDocument();
     if (!doc) return;
     const trimmed = title.trim();
     const base = trimmed ? sanitizeFilename(trimmed) : "document";
     const filename = `${base}.${exporter.extension}`;
-    downloadText(exporter.serialize(doc), filename, exporter.mimeType);
+    await downloadText(exporter.serialize(doc), filename, exporter.mimeType);
   };
 
   return (

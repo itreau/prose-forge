@@ -19,7 +19,12 @@ import { extractDocument, toMarkdown } from "../document";
 import { getSelectionTarget } from "../ai/selection-target";
 import { applyModification } from "../ai/apply-modification";
 import { insertGeneratedText } from "../ai/keysmash-insert";
+import { pickFile, parseContent, editorHasContent } from "../document/import";
 import type { EditorView } from "prosemirror-view";
+import TitleBar from "./TitleBar";
+import { ErrorBoundary } from "../components/ErrorBoundary";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { useConfirmDialog } from "../hooks/useConfirmDialog";
 
 type ActivePanel = "scene" | "editor" | "document" | "export" | null;
 
@@ -32,6 +37,7 @@ export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const editorStateRef = useRef<EditorState | null>(null);
   const editorViewRef = useRef<EditorView | null>(null);
+  const confirmDialog = useConfirmDialog();
 
   const { state: modifyState, open: modifyOpen, close: modifyClose, stop: modifyStop, submit: modifySubmit, clearPreview: modifyClearPreview } = useModify();
 
@@ -76,6 +82,24 @@ export default function App() {
     editorViewRef.current = view;
   }, []);
 
+  const handleImport = useCallback(async () => {
+    const result = await pickFile();
+    if (!result) return;
+
+    const state = editorStateRef.current;
+    if (editorHasContent(state)) {
+      const confirmed = await confirmDialog.confirm("Importing will replace the current document content. Continue?");
+      if (!confirmed) return;
+    }
+
+    const view = editorViewRef.current;
+    if (!view) return;
+
+    const newDoc = parseContent(result.content, result.name);
+    const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, newDoc.content);
+    view.dispatch(tr);
+  }, [confirmDialog]);
+
   if (!loaded) return null;
 
   const combinedEditorStyles = {
@@ -85,22 +109,27 @@ export default function App() {
 
   return (
     <>
-      <PaperScene config={config} className="scene-canvas" showLightHelper={activePanel === "scene"} />
+      <TitleBar />
+      <ErrorBoundary>
+        <PaperScene config={config} className="scene-canvas" showLightHelper={activePanel === "scene"} />
+      </ErrorBoundary>
       <div className="editor-overlay" style={chatOpen ? { marginRight: "340px" } : undefined}>
-        <ProseMirrorEditor
-          onSceneToggle={() => setActivePanel((v) => v === "scene" ? null : "scene")}
-          onEditorToggle={() => setActivePanel((v) => v === "editor" ? null : "editor")}
-          onExportToggle={() => setActivePanel((v) => v === "export" ? null : "export")}
-          onDocumentToggle={() => setActivePanel((v) => v === "document" ? null : "document")}
-          onChatToggle={() => setChatOpen((v) => !v)}
-          onModifyToggle={handleModifyToggle}
-          onKeysmash={keysmashOpen}
-          isKeysmashing={keysmashState.isStreaming}
-          chatOpen={chatOpen}
-          onStateChange={handleEditorStateChange}
-          onViewReady={handleViewReady}
-          editorStyles={combinedEditorStyles}
-        />
+        <ErrorBoundary>
+          <ProseMirrorEditor
+            onSceneToggle={() => setActivePanel((v) => v === "scene" ? null : "scene")}
+            onEditorToggle={() => setActivePanel((v) => v === "editor" ? null : "editor")}
+            onExportToggle={() => setActivePanel((v) => v === "export" ? null : "export")}
+            onDocumentToggle={() => setActivePanel((v) => v === "document" ? null : "document")}
+            onChatToggle={() => setChatOpen((v) => !v)}
+            onModifyToggle={handleModifyToggle}
+            onKeysmash={keysmashOpen}
+            isKeysmashing={keysmashState.isStreaming}
+            chatOpen={chatOpen}
+            onStateChange={handleEditorStateChange}
+            onViewReady={handleViewReady}
+            editorStyles={combinedEditorStyles}
+          />
+        </ErrorBoundary>
       </div>
       {chatOpen && (
         <ChatSidebar
@@ -155,12 +184,20 @@ export default function App() {
           onReset={onDocumentReset}
           onDownload={onDocumentDownload}
           onClose={() => setActivePanel(null)}
+          onImport={handleImport}
         />
       )}
       {activePanel === "export" && (
         <ExportOptions
           getDocument={getEditorDoc}
           onClose={() => setActivePanel(null)}
+        />
+      )}
+      {confirmDialog.state.open && (
+        <ConfirmDialog
+          message={confirmDialog.state.message}
+          onConfirm={confirmDialog.state.onConfirm!}
+          onCancel={confirmDialog.cancel}
         />
       )}
     </>

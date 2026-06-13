@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useRef } from "react";
+import { useReducer, useCallback, useEffect, useRef } from "react";
 import { Effect, Stream, Fiber } from "effect";
 import type { RuntimeFiber } from "effect/Fiber";
 import { FetchHttpClient } from "@effect/platform";
@@ -123,6 +123,10 @@ export function useKeysmash(getState: () => EditorState | null) {
   const clearPreview = useCallback(() => {
     dispatch({ type: "clearPreview" });
   }, []);
+
+  useEffect(() => {
+    return () => { cancelFiber(); };
+  }, [cancelFiber]);
 
   return { state, open, close, stop, submit, clearPreview };
 }

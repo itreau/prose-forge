@@ -114,6 +114,18 @@ body {
   margin: 0;
 }
 
+.title-bar-drag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.25rem;
+  z-index: 100;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
 #root {
   position: relative;
   min-height: 100svh;
@@ -136,6 +148,22 @@ body {
   @media (max-width: 640px) {
     padding: 1rem 0.75rem;
   }
+}
+
+[data-tauri] .editor-overlay {
+  top: 2.25rem;
+}
+
+[data-tauri] .chat-sidebar {
+  top: 2.25rem;
+}
+
+[data-tauri] .modify-prompt-overlay {
+  top: 2.25rem;
+}
+
+[data-tauri] .panel {
+  top: 2.25rem;
 }
 
 .editor-overlay > div {

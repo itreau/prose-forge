@@ -44,9 +44,10 @@ export function SliderField({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
-
-  if (!editing && draft !== String(value)) {
-    setDraft(String(value));
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
+    if (!editing) setDraft(String(value));
   }
 
   return (
@@ -182,8 +183,9 @@ export function PathField({
   onChange: (v: string) => void;
 }) {
   const [local, setLocal] = useState(value);
-
-  if (local !== value && document.activeElement?.getAttribute("data-path-label") !== label) {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     setLocal(value);
   }
 

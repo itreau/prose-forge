@@ -1,5 +1,6 @@
 import { useReducer, useCallback, useEffect, useRef } from "react";
-import { Effect, Stream } from "effect";
+import { Effect, Stream, Fiber } from "effect";
+import type { RuntimeFiber } from "effect/Fiber";
 import { FetchHttpClient } from "@effect/platform";
 import { getChatClient } from "./client";
 import type { ChatMessage } from "./types";
@@ -58,15 +59,31 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
   }
 }
 
+type StreamFiber = RuntimeFiber<void, unknown>;
+
 export function useChat() {
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const messagesRef = useRef(state.messages);
+  const fiberRef = useRef<StreamFiber | null>(null);
   useEffect(() => {
     messagesRef.current = state.messages;
   }, [state.messages]);
 
+  const cancelFiber = useCallback(() => {
+    if (fiberRef.current) {
+      Effect.runPromise(Fiber.interrupt(fiberRef.current)).catch(() => {});
+      fiberRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => { cancelFiber(); };
+  }, [cancelFiber]);
+
   const sendMessage = useCallback((text: string, documentMarkdown: string) => {
     if (state.isStreaming) return;
+
+    cancelFiber();
 
     const systemContent = loadPrompt(promptTemplate, { document: documentMarkdown });
     const apiMessages: ChatMessage[] = [
@@ -91,12 +108,13 @@ export function useChat() {
       Effect.provide(FetchHttpClient.layer),
     );
 
-    Effect.runPromise(program);
-  }, [state.isStreaming]);
+    fiberRef.current = Effect.runFork(program);
+  }, [state.isStreaming, cancelFiber]);
 
   const clear = useCallback(() => {
+    cancelFiber();
     dispatch({ type: "clear" });
-  }, []);
+  }, [cancelFiber]);
 
   return { state, sendMessage, clear };
 }

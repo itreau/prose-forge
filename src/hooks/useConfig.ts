@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { loadFromStorage, saveToStorage, clearStorage, downloadJson } from "./useStorage";
 
 export interface UseConfigOptions<T> {
   storageKey: string;
@@ -15,36 +16,9 @@ export interface UseConfigResult<T> {
   onDownload: () => void;
 }
 
-function loadFromStorage<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
-
-function saveToStorage<T>(key: string, config: T): void {
-  localStorage.setItem(key, JSON.stringify(config));
-}
-
-function clearStorage(key: string): void {
-  localStorage.removeItem(key);
-}
-
-function downloadJson<T>(config: T, filename: string): void {
-  const blob = new Blob([JSON.stringify(config, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 export function useConfig<T>(options: UseConfigOptions<T>): UseConfigResult<T> {
   const { storageKey, fetchUrl, defaultValue } = options;
+  const defaultValueRef = useRef(defaultValue);
   const [config, setConfig] = useState<T>(defaultValue);
   const [loaded, setLoaded] = useState(false);
 
@@ -59,13 +33,13 @@ export function useConfig<T>(options: UseConfigOptions<T>): UseConfigResult<T> {
           const data: T = await res.json();
           setConfig(data);
         } catch {
-          setConfig(defaultValue);
+          setConfig(defaultValueRef.current);
         }
       }
       setLoaded(true);
     }
     init();
-  }, [storageKey, fetchUrl, defaultValue]);
+  }, [storageKey, fetchUrl]);
 
   const handleChange = useCallback((next: T) => {
     setConfig(next);
@@ -77,8 +51,8 @@ export function useConfig<T>(options: UseConfigOptions<T>): UseConfigResult<T> {
 
   const handleReset = useCallback(() => {
     clearStorage(storageKey);
-    setConfig(defaultValue);
-  }, [storageKey, defaultValue]);
+    setConfig(defaultValueRef.current);
+  }, [storageKey]);
 
   const handleDownload = useCallback(() => {
     downloadJson(config, `${storageKey}.json`);

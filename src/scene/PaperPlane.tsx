@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { Mesh, Texture } from "three";
@@ -18,14 +18,17 @@ const WRAPPING_MAP: Record<string, THREE.Wrapping> = {
 export default function PaperPlane({ material, plane }: PaperPlaneProps) {
   const meshRef = useRef<Mesh>(null);
 
-  const textureEntries: Record<string, string> = {
-    map: material.diffuse,
-    roughnessMap: material.roughness,
-    normalMap: material.normal,
-    displacementMap: material.height,
-  };
-  if (material.specular) textureEntries.metalnessMap = material.specular;
-  if (material.ao) textureEntries.aoMap = material.ao;
+  const textureEntries = useMemo((): Record<string, string> => {
+    const entries: Record<string, string> = {
+      map: material.diffuse,
+      roughnessMap: material.roughness,
+      normalMap: material.normal,
+      displacementMap: material.height,
+    };
+    if (material.specular) entries.metalnessMap = material.specular;
+    if (material.ao) entries.aoMap = material.ao;
+    return entries;
+  }, [material.diffuse, material.roughness, material.normal, material.height, material.specular, material.ao]);
 
   const textures = useTexture(textureEntries);
 

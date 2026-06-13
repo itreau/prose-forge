@@ -3,7 +3,6 @@ import { EditorState } from "prosemirror-state";
 import type { EditorView } from "prosemirror-view";
 import { ProseMirror, useEditorEventCallback, useEditorEffect, useEditorState } from "@nytimes/react-prosemirror";
 import { react } from "@nytimes/react-prosemirror";
-import { Wrench } from "lucide-react";
 import { editorSchema } from "./schema";
 import { createPlugins } from "./plugins";
 import EditorToolbar from "./toolbar/EditorToolbar";
@@ -51,7 +50,6 @@ function EditorInner({
   onViewReady?: (view: EditorView | null) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [editorFocused, setEditorFocused] = useState(false);
   const [mouseNearTop, setMouseNearTop] = useState(false);
 
   const focusEditor = useEditorEventCallback((view) => {
@@ -93,12 +91,10 @@ function EditorInner({
     };
   }, []);
 
-  const toolbarVisible = !editorFocused || mouseNearTop;
-
   return (
     <div ref={containerRef} className="editor-container" onClick={handleDocumentClick}>
       <EditorToolbar
-        visible={toolbarVisible}
+        visible={mouseNearTop}
         onSceneToggle={onSceneToggle}
         onEditorToggle={onEditorToggle}
         onExportToggle={onExportToggle}
@@ -109,19 +105,9 @@ function EditorInner({
         isKeysmashing={isKeysmashing}
         chatOpen={chatOpen}
       />
-      <button
-        className={`editor-menu-icon ${toolbarVisible ? "editor-menu-icon-hidden" : "editor-menu-icon-visible"}`}
-        onClick={() => setMouseNearTop(true)}
-        type="button"
-        aria-label="Show toolbar"
-      >
-        <Wrench className="size-4" />
-      </button>
       <div
         ref={mountRef}
         className="prosemirror-mount"
-        onFocus={() => setEditorFocused(true)}
-        onBlur={() => setEditorFocused(false)}
       />
       <WordCount />
     </div>
